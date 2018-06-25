@@ -37,12 +37,9 @@ module.exports = merge(base, {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
               importLoaders: 1,
               minimize: true,
-              sourceMap: true,
-              camelCase: true,
-              localIdentName: '[path][name]__[local]--[hash:base64:5]'
+              sourceMap: true
             }
           },
           {

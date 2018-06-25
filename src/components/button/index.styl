@@ -1,0 +1,188 @@
+@import '../../assets/styles/variables.styl'
+
+.ufe-btn-group
+  position relative
+  display inline-block
+  .ufe-btn
+    position relatve
+    line-height 30px
+    margin 0 0 0 -1px
+    &.ufe-btn-primary
+      border-color $hover-color
+    &.ufe-btn-danger
+      color #fff
+      border-color $danger-hover-color
+      background-color $danger-color
+      &:hover
+        color #fff
+        background-color $danger-hover-color
+      &:focus
+        color #fff
+        background-color $danger-hover-color
+      &:active
+        color #fff
+        background-color $danger-active-color
+    &:hover,&:focus,&:active
+      z-index 2
+    &:disabled
+      z-index 0
+    &:not(:first-child):not(:last-child)
+      border-radius 0
+    &:first-child
+      margin-left 0
+    &:first-child:not(:last-child)
+      border-bottom-right-radius 0
+      border-top-right-radius 0
+    &:last-child:not(:first-child)
+      border-bottom-left-radius 0
+      border-top-left-radius 0
+  &.ufe-btn-group-large
+    .ufe-btn
+      font-size $font-size-lg
+      height 40px
+      line-height 40px
+  &.ufe-btn-group-small
+    .ufe-btn
+      padding 0 7px
+      height 24px
+      line-height 24px
+.ufe-btn
+  appearance button
+  outline none
+  line-height $line-height-base
+  display inline-block
+  text-align center
+  font-weight 400
+  cursor pointer
+  border $border-base
+  white-space nowrap
+  padding 0 15px
+  font-size $font-size-base
+  border-radius $border-radius-base
+  height 32px
+  user-select none
+  position relative
+  color $text-color
+  background-color $btn-default-bg
+  transition all .3s $ease-in-out
+  text-decoration none
+  i
+    display inline-block
+    vertical-align baseline
+    text-align center
+    margin-right 6px
+    font-size $font-size-base
+  &:hover, &:focus
+    color $hover-color
+    border-color $hover-border-color
+  &:active
+    color $active-color
+    border-color $active-border-color
+  &:disabled
+    color rgba(0,0,0,.25)
+    background-color #f5f5f5
+    border-color #d9d9d9
+    cursor not-allowed
+  &.ufe-btn-dashed
+    border-style dashed
+  &.ufe-btn-primary
+    color #fff
+    border-color $primary-color
+    background-color: $primary-color
+    &:hover, &:focus
+      background-color $hover-color
+      border-color $hover-border-color
+    &:active
+      background-color $active-color
+      border-color $active-border-color
+  &.ufe-btn-danger
+    color $danger-color
+    background-color: $danger-background-color
+    &:hover
+      color #fff
+      background-color $danger-hover-color
+      border-color $danger-hover-color
+    &:focus
+      color $danger-hover-color
+      background-color #fff
+      border-color $danger-hover-color
+    &:active
+      color #fff
+      background-color $danger-active-color
+      border-color $danger-active-color
+    &.ufe-btn-clicked::after
+      border-color $danger-color
+  &.ufe-btn-large
+    font-size $font-size-lg
+    height 40px
+  &.ufe-btn-small
+    padding 0 7px
+    height 24px
+  &.ufe-btn-ghost
+    background transparent!important
+    color #fff
+    border-color #fff
+    &.ufe-btn-primary
+      color $primary-color
+      border-color $primary-color
+    &.ufe-btn-danger
+      color $danger-color
+      border-color $danger-color
+      &:hover
+        color $danger-hover-color
+        border-color $danger-hover-color
+      &:focus
+        color $danger-hover-color
+        border-color $danger-hover-color
+      &:active
+        color $danger-active-color
+        border-color $danger-active-color
+    &:hover
+      color $hover-color
+      border-color $hover-color
+    &:active
+      color $active-color
+      border-color $active-color
+  &.ufe-btn-circle
+    border-radius 50%
+    width 32px
+    height 32px
+    padding 0
+    font-size 16px
+    & i
+      margin 0
+      font-size 16px
+  &.ufe-btn-clicked::after
+    content ''
+    position absolute
+    top -1px
+    left -1px
+    bottom -1px
+    right -1px
+    border 0 solid $primary-color
+    opacity 0.4
+    animation buttonEffect .4s
+    display block
+  &:before
+    position absolute
+    top -1px
+    left -1px
+    bottom -1px
+    right -1px
+    background #fff
+    opacity 0.35
+    content ''
+    border-radius inherit
+    z-index 1
+    transition opacity .2s
+    pointer-events none
+    display none
+
+@keyframes buttonEffect
+  to
+    opacity 0
+    top -6px
+    left -6px
+    bottom -6px
+    right -6px
+    border-width 6px
