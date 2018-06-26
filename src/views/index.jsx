@@ -1,4 +1,5 @@
 import Button from '../components/button/demo'
+import Icon from '../components/icon/demo'
 import { hot } from 'react-hot-loader'
 import React, { Component } from 'react'
 import { BrowserRouter, Redirect, Route, NavLink } from 'react-router-dom'
@@ -15,10 +16,16 @@ class App extends Component {
                 button
               </NavLink>
             </li>
+            <li>
+              <NavLink activeClassName={styles.active} to='/icon'>
+                icon
+              </NavLink>
+            </li>
           </ul>
           <div className={styles.content}>
             <Route exact path='/' render={() => <Redirect to='/button' />} />
             <Route path='/button' component={Button} />
+            <Route path='/icon' component={Icon} />
           </div>
         </div>
       </BrowserRouter>
