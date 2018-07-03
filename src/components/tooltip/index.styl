@@ -1,0 +1,67 @@
+@import('../../assets/styles/variables.styl')
+
+.ufe-popup
+  font-size $font-size-base
+  line-height $line-height-base
+  color $text-color
+  box-sizing border-box
+  margin 0
+  padding 0
+  list-style none
+  cursor default
+  position absolute
+  transition all .1s $ease-out-circ
+  z-index $zIndex-high
+  .ufe-tooltip-arrow
+    position absolute
+    width 0
+    height 0
+    border-color transparent
+    border-style solid
+    &.ufe-tooltip-arrow-topLeft, &.ufe-tooltip-arrow-top, &.ufe-tooltip-arrow-topRight
+      bottom 3px
+      border-width 5px 5px 0
+      border-top-color $tooltip-border-color
+    &.ufe-tooltip-arrow-bottom, &.ufe-tooltip-arrow-bottomLeft, &.ufe-tooltip-arrow-bottomRight
+      top 3px
+      border-width 0 5px 5px
+      border-bottom-color $tooltip-border-color
+    &.ufe-tooltip-arrow-left, &.ufe-tooltip-arrow-leftTop, &.ufe-tooltip-arrow-leftBottom
+      right 3px
+      border-width 5px 0 5px 5px
+      border-left-color $tooltip-border-color
+    &.ufe-tooltip-arrow-right, &.ufe-tooltip-arrow-rightTop, &.ufe-tooltip-arrow-rightBottom
+      left 3px
+      border-width 5px 5px 5px 0
+      border-right-color $tooltip-border-color
+    &.ufe-tooltip-arrow-topLeft, &.ufe-tooltip-arrow-bottomLeft
+      left 16px
+    &.ufe-tooltip-arrow-topRight, &.ufe-tooltip-arrow-bottomRight
+      right 16px
+    &.ufe-tooltip-arrow-leftTop, &.ufe-tooltip-arrow-rightTop
+      top 8px
+    &.ufe-tooltip-arrow-leftBottom, &.ufe-tooltip-arrow-rightBottom
+      bottom 8px
+    &.ufe-tooltip-arrow-bottom, &.ufe-tooltip-arrow-top
+      left 50%
+      margin-left -5px
+    &.ufe-tooltip-arrow-left, &.ufe-tooltip-arrow-right
+      top 50%
+      margin-top -5px
+  .ufe-tooltip-content
+    max-width 250px
+    padding 6px 8px
+    color #fff
+    text-align left
+    text-decoration none
+    background-color $tooltip-border-color
+    border-radius $border-radius-base
+    box-shadow $tooltip-box-shadow
+    &.ufe-tooltip-content-topLeft, &.ufe-tooltip-content-top, &.ufe-tooltip-content-topRight
+      margin-bottom 8px
+    &.ufe-tooltip-content-bottomLeft, &.ufe-tooltip-content-bottom, &.ufe-tooltip-content-bottomRight
+      margin-top 8px
+    &.ufe-tooltip-content-leftTop, &.ufe-tooltip-content-left, &.ufe-tooltip-content-leftBottom
+      margin-right 8px
+    &.ufe-tooltip-content-rightTop, &.ufe-tooltip-content-right, &.ufe-tooltip-content-rightBottom
+      margin-left 8px
