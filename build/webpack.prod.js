@@ -12,7 +12,7 @@ module.exports = merge(base, {
   output: {
     filename: 'js/[name].[chunkhash].js',
     chunkFilename: 'js/[name].[chunkhash].js',
-    publicPath: '/dist/'
+    publicPath: '/'
   },
   optimization: {
     splitChunks: {

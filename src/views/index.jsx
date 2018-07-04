@@ -4,6 +4,7 @@ import { hot } from 'react-hot-loader'
 import React, { Component } from 'react'
 import { BrowserRouter, Redirect, Route, NavLink } from 'react-router-dom'
 import styles from './index.styl'
+import ToolTip from '../components/tooltip/demo'
 
 class App extends Component {
   render () {
@@ -21,11 +22,17 @@ class App extends Component {
                 icon
               </NavLink>
             </li>
+            <li>
+              <NavLink activeClassName={styles.active} to='/tooltip'>
+                tooltip
+              </NavLink>
+            </li>
           </ul>
           <div className={styles.content}>
             <Route exact path='/' render={() => <Redirect to='/button' />} />
             <Route path='/button' component={Button} />
             <Route path='/icon' component={Icon} />
+            <Route path='/tooltip' component={ToolTip} />
           </div>
         </div>
       </BrowserRouter>
