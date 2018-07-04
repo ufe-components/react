@@ -166,9 +166,11 @@ class ToolTip extends Component {
 
   componentDidUpdate (_, prevState) {
     const rect = findDOMNode(this).getBoundingClientRect()
+
     if (this._rect && this._rect.left === rect.left && this._rect.right === rect.right && this._rect.top === rect.top && this._rect.bottom === rect.bottom && this._rect.width === rect.width && this._rect.height === rect.height && prevState.visible === this.state.visible) {
       return
     }
+
     this._rect = rect
     if (this.props.mouseDelay) {
       this.clearDelayTimer()
@@ -197,6 +199,7 @@ class ToolTip extends Component {
       width,
       height
     }
+    this.getComponent()
   }
 
   computeSize (placement) {
