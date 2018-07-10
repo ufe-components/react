@@ -7,32 +7,44 @@ import classNames from 'classnames'
 class Popup extends Component {
   static propTypes = {
     className: PropTypes.string,
-    title: PropTypes.string,
+    title: PropTypes.any,
     shouldToggle: PropTypes.func,
     childRect: PropTypes.func,
     placement: PropTypes.string,
     trigger: PropTypes.string,
     contentStyle: PropTypes.object,
     contentClassName: PropTypes.string,
-    visible: PropTypes.bool
+    visible: PropTypes.bool,
+    showArrow: PropTypes.bool,
+    afterClickAction: PropTypes.func
   }
 
   static defaultProps = {
     title: 'pop up'
   }
 
-  handleMouseLeave = () => {
-    if (this.props.trigger === 'hover' && this.props.visible === undefined) {
+  handleMouseLeave = e => {
+    // e.stopPropagation()
+    if (this.props.trigger === 'hover') {
       this.props.shouldToggle(false)
     }
   }
 
-  handleMouseEnter = () => {
-    if (this.props.trigger === 'hover' && this.props.visible === undefined) { this.props.shouldToggle(true) }
+  handleMouseEnter = e => {
+    // e.stopPropagation()
+    if (this.props.trigger === 'hover') { this.props.shouldToggle(true) }
   }
 
   handleClick = (e) => {
-    e.stopPropagation()
+    if (this.props.trigger === 'click') {
+      e.stopPropagation()
+    }
+    if (this.props.trigger === 'hover') {
+      this.props.shouldToggle(false)
+    }
+    if (this.props.visible) {
+      this.props.afterClickAction()
+    }
   }
 
   bindEvent () {
@@ -48,21 +60,18 @@ class Popup extends Component {
   componentDidMount () {
     const dom = findDOMNode(this)
     this.props.childRect(dom.offsetWidth, dom.offsetHeight)
-    if (this.props.visible === undefined) {
-      this.bindEvent()
-    }
+    this.bindEvent()
   }
 
   componentWillUnmount () {
-    if (this.props.visible === undefined) {
-      this.unBindEvent()
-    }
+    this.unBindEvent()
   }
 
   render () {
-    const { title, className, shouldToggle, childRect, placement, trigger, contentClassName, contentStyle, visible, ...rest } = this.props
+    const { title, className, shouldToggle, childRect, placement, trigger, contentClassName, contentStyle, visible, showArrow, afterClickAction, ...rest } = this.props
     const classes = classNames({
-      [styles['ufe-popup']]: true
+      [styles['ufe-popup']]: true,
+      [styles['ufe-popup-zIndex']]: visible
     }, className)
     const arrowClass = classNames({
       [styles['ufe-tooltip-arrow']]: true,
@@ -74,7 +83,7 @@ class Popup extends Component {
     }, contentClassName)
     return (
       <div onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} className={classes} {...rest}>
-        <div className={arrowClass} />
+        { showArrow ? <div className={arrowClass} /> : null}
         <div style={contentStyle} className={contentClass}>
           {title}
         </div>
