@@ -9,7 +9,7 @@ class ToolTipDemo extends Component {
   }
 
   state = {
-    visible: true
+    visible: false
   }
 
   handleChange = () => {
@@ -20,9 +20,18 @@ class ToolTipDemo extends Component {
 
   render () {
     return (
-      <ToolTip visible={this.state.visible} onVisibleChange={this.handleChange} title='haha' placement='top' className={styles.tip}>
-        <Button onClick={this.handleChange}>hover me to show more message</Button>
-      </ToolTip>
+      <div>
+        <section className={styles.tip}>
+          <ToolTip trigger='hover' title='haha' placement='top'>
+            <Button onClick={this.handleChange}>hover me to show more message</Button>
+          </ToolTip>
+        </section>
+        <section className={styles.tip}>
+          <ToolTip trigger='click' title='lol' placement='bottom'>
+            <Button onClick={this.handleChange}>click me to show more message</Button>
+          </ToolTip>
+        </section>
+      </div>
     )
   }
 }

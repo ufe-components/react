@@ -1,4 +1,30 @@
 @import "../../assets/styles/variables.styl"
+@import "../../assets/styles/mixin.styl"
+
+.ufe-menu-item, .ufe-sub-menu-title
+  cursor pointer
+  margin 0
+  padding 0 20px
+  white-space nowrap
+  transition color .3s $ease-in-out, border-color .3s $ease-in-out, background .3s $ease-in-out, padding .3s $ease-in-out
+  i
+    min-width 14px
+    margin-right 10px
+    transition font-size .15s $ease-out, margin .3s $ease-in-out
+  &:hover
+    color $primary-color
+  &.ufe-menu-item-selected
+    color $primary-color
+    background-color $menu-item-selected-bgc
+  &.ufe-sub-menu-selected
+    color $primary-color
+  &.ufe-menu-item-disabled, &.ufe-sub-menu-disabled
+    color $disable-color
+    cursor not-allowed
+    background none
+    border-color transparent
+    &:hover
+      color $disable-color
 
 .ufe-menu
   font-size $font-size-base
@@ -9,25 +35,118 @@
   outline none
   margin-bottom 0
   list-style none
-  box-shadow $box-shadow-base
   color $text-color
   transition background .3s, width .2s
-  zoom 1
-  .ufe-menu-item
-    cursor pointer
+  clearfix()
+
+.ufe-menu-horizontal
+  border 0
+  border-bottom $menu-border
+  line-height 46px
+  .ufe-menu-item, >.ufe-sub-menu>.ufe-sub-menu-title
+    display inline-block
+    position relative
+    top 1px
+    float left
+    border-bottom 2px solid transparent
+    margin-top -1px
+    &:hover
+      border-bottom 2px solid $primary-color
+    &.ufe-menu-item-selected, &.ufe-sub-menu-selected
+      border-bottom 2px solid $primary-color
+      background-color transparent
+    &.ufe-menu-item-disabled, &.ufe-sub-menu-disabled
+      &:hover
+        border-bottom 2px solid transparent
+
+.ufe-menu-inline, .ufe-menu-vertical, .ufe-menu-vertical-right, .ufe-menu-tooltip-content, .ufe-menu-group
+  .ufe-menu-item, .ufe-sub-menu-title
+    line-height 40px
+    height 40px
+    margin-top 4px
+    margin-bottom 4px
+    overflow hidden
+    text-overflow ellipsis
+  .ufe-sub-menu-title
+    padding 0
+    display flex
+    align-items center
+    justify-content space-between
+    i
+      font-weight 700
+
+.ufe-menu-inline
+  border-right $menu-border
+  .ufe-menu-item-selected
+    border-right 3px solid $primary-color
+    transition opacity .3s $ease-in-out
+  .ufe-sub-menu
+    .ufe-sub-menu
+      padding-left 20px
+
+.ufe-menu-vertical
+  border-right $menu-border
+
+.ufe-menu-vertical-right
+  border-left $menu-border
+  float right
+  .ufe-menu-item, .ufe-sub-menu-title
+    text-align right
+
+.ufe-menu-tooltip-content
+  background-color #fff!important
+  border-radius $border-radius-base!important
+  color $text-color!important
+  .ufe-menu-item, .ufe-sub-menu-title
+      padding 0 16px 0 28px
+  .ufe-sub-menu-title
+    min-width 160px
+  &.ufe-menu-tooltip-content-right
+    .ufe-menu-item, .ufe-sub-menu-title
+      text-align right
+
+.ufe-menu-group
+  .ufe-menu-group-title
+    color $title-color
+    font-size $font-size-base
+    line-height $line-height-base
+    padding 8px 16px
+    transition all .3s
+    cursor auto
+  .ufe-menu-group-list
+    padding 0
     margin 0
-    padding 0 20px
-    display block
-    white-space nowrap
-    transition color .3s $ease-in-out, border-color .3s $ease-in-out, background .3s $ease-in-out, padding .3s $ease-in-out
-  &.ufe-menu-horizontal
-    border 0
-    border-bottom $menu-border-bottom
-    box-shadow none
-    line-height 46px
-    .ufe-menu-item
-      position relative
-      top 1px
-      float left
-      border-bottom 2px solid transparent
-      margin-top -1px
+    .ufe-menu-item, &.ufe-sub-menu-title
+      padding 0 16px 0 28px
+
+.ufe-sub-menu-list-enter
+  transform-origin 0 0
+  transform scaleY(0.0001)
+  opacity 0
+.ufe-sub-menu-list-enter-active
+  transform scaleY(1)
+  opacity 1
+  transition transform .15s $ease-out, opacity .15s $ease-out
+.ufe-sub-menu-list-exit
+  transform-origin 0 0
+  transform scaleY(1)
+  opacity 1
+.ufe-sub-menu-list-exit-active
+  transform scaleY(0.0001)
+  opacity 0
+  transition transform .15s $ease-in-out, opacity .15s $ease-in-out
+
+.ufe-sub-menu-icon-enter
+  transform rotate(180deg)
+.ufe-sub-menu-icon-enter-active
+  transform rotate(360deg)
+  transition transform .15s ease-in-out!important
+.ufe-sub-menu-icon-enter-done
+  transform rotate(360deg)
+.ufe-sub-menu-icon-exit
+  transform rotate(0)
+.ufe-sub-menu-icon-exit-active
+  transform rotate(180deg)
+  transition transform .15s ease-out!important
+.ufe-sub-menu-icon-exit-done
+  transform rotate(180deg)

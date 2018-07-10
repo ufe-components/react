@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { createPortal, findDOMNode } from 'react-dom'
 import PropTypes from 'prop-types'
+import {CSSTransition} from 'react-transition-group'
 import PopUp from './popup'
+import styles from './index.styl'
 
 class ToolTip extends Component {
   static propTypes = {
@@ -13,7 +15,10 @@ class ToolTip extends Component {
     contentClassName: PropTypes.string,
     contentStyle: PropTypes.object,
     visible: PropTypes.bool,
-    onVisibleChange: PropTypes.func
+    onVisibleChange: PropTypes.func,
+    showArrow: PropTypes.bool,
+    hideAfterClick: PropTypes.bool,
+    autoWidth: PropTypes.bool
   }
 
   static defaultProps = {
@@ -21,21 +26,32 @@ class ToolTip extends Component {
     placement: 'top',
     title: 'pop up',
     trigger: 'hover',
-    contentStyle: {}
+    contentStyle: {},
+    showArrow: true,
+    autoWidth: false,
+    hideAfterClick: false
   }
 
   state = {
-    visible: this.props.visible
+    visible: !!this.props.visible
   }
 
   _toggle = false
+
+  hide = () => {
+    this.setState({
+      visible: false
+    })
+  }
 
   show = (e) => {
     e.stopPropagation()
     this.setState(() => ({
       visible: true
     }), () => {
-      this.props.onVisibleChange(this.state.visible)
+      if (typeof this.props.onVisibleChange === 'function') {
+        this.props.onVisibleChange(this.state.visible)
+      }
     })
   }
 
@@ -46,7 +62,9 @@ class ToolTip extends Component {
     this.setState(() => ({
       visible: false
     }), () => {
-      this.props.onVisibleChange(this.state.visible)
+      if (typeof this.props.onVisibleChange === 'function') {
+        this.props.onVisibleChange(this.state.visible)
+      }
     })
   }
 
@@ -57,7 +75,9 @@ class ToolTip extends Component {
       this.setState(() => ({
         visible: false
       }), () => {
-        this.props.onVisibleChange(this.state.visible)
+        if (typeof this.props.onVisibleChange === 'function') {
+          this.props.onVisibleChange(this.state.visible)
+        }
       })
     }
   }
@@ -70,7 +90,9 @@ class ToolTip extends Component {
     this.setState({
       visible: !this.state.visible
     }, () => {
-      this.props.onVisibleChange(this.state.visible)
+      if (typeof this.props.onVisibleChange === 'function') {
+        this.props.onVisibleChange(this.state.visible)
+      }
     })
   }
 
@@ -80,7 +102,9 @@ class ToolTip extends Component {
     this.setState(() => ({
       visible: false
     }), () => {
-      this.props.onVisibleChange(this.state.visible)
+      if (typeof this.props.onVisibleChange === 'function') {
+        this.props.onVisibleChange(this.state.visible)
+      }
     })
   }
 
@@ -92,7 +116,9 @@ class ToolTip extends Component {
     this.setState(() => ({
       visible: true
     }), () => {
-      this.props.onVisibleChange(this.state.visible)
+      if (typeof this.props.onVisibleChange === 'function') {
+        this.props.onVisibleChange(this.state.visible)
+      }
     })
   }
 
@@ -103,7 +129,9 @@ class ToolTip extends Component {
     this.setState(() => ({
       visible: false
     }), () => {
-      this.props.onVisibleChange(this.state.visible)
+      if (typeof this.props.onVisibleChange === 'function') {
+        this.props.onVisibleChange(this.state.visible)
+      }
     })
   }
 
@@ -113,6 +141,7 @@ class ToolTip extends Component {
   }
 
   bindEvent () {
+    window.onresize = () => this.getComponent(this.props.placement)
     const dom = findDOMNode(this)
     if (this.props.trigger === 'hover') {
       dom.addEventListener('mouseenter', this.show)
@@ -131,6 +160,7 @@ class ToolTip extends Component {
   }
 
   unbindEvent () {
+    window.onresize = null
     const dom = findDOMNode(this)
     if (this.props.trigger === 'hover') {
       dom.removeEventListener('mouseenter', this.show)
@@ -149,14 +179,12 @@ class ToolTip extends Component {
   }
 
   componentDidMount () {
-    if (this.props.visible === undefined) {
-      this.bindEvent()
-    }
+    this.bindEvent()
     this.componentDidUpdate({}, {visible: this.state.visible})
   }
 
   static getDerivedStateFromProps (props, state) {
-    if (props.visible !== state.visible) {
+    if (props.visible !== undefined && props.visible !== state.visible) {
       return {
         visible: props.visible
       }
@@ -189,9 +217,7 @@ class ToolTip extends Component {
   }
 
   componentWillUnmount () {
-    if (this.props.visible === undefined) {
-      this.unbindEvent()
-    }
+    this.unbindEvent()
   }
 
   getChildSize = (width, height) => {
@@ -207,6 +233,8 @@ class ToolTip extends Component {
     const height = this._tooltip ? this._tooltip.height : 0
     let top = 0
     let left = 0
+    const scrollTop = window.pageYOffset
+    const scrollLeft = window.pageXOffset
     switch (placement) {
       case 'top':
         top = this._rect.top - height
@@ -257,39 +285,64 @@ class ToolTip extends Component {
         left = this._rect.left + this._rect.width
         break
     }
-    if (placement.includes('top') || placement.includes('bottom')) {
-      if (top <= 0) {
+    if (placement.includes('top') && top <= 0) {
+      // 转换到下面还是不够就放弃
+      const bottom = window.innerHeight - this._rect.bottom
+      if (height < bottom) {
         return this.computeSize(placement.replace('top', 'bottom'))
       }
-      if (top >= window.innerHeight - height) {
+    }
+    if (placement.includes('bottom') && top >= window.innerHeight - height) {
+      if (height < this._rect.top) {
         return this.computeSize(placement.replace('bottom', 'top'))
       }
     }
-    if (placement.includes('left') || placement.includes('right')) {
-      if (left <= 0) {
+    if (placement.includes('left') && left <= 0) {
+      const right = window.innerWidth - this._rect.right
+      if (width < right) {
         return this.computeSize(placement.replace('left', 'right'))
       }
-      if (left >= window.innerWidth - width) {
+    }
+    if (placement.includes('right') && left >= window.innerWidth - width) {
+      if (width < this._rect.left) {
         return this.computeSize(placement.replace('right', 'left'))
       }
     }
+    top += scrollTop
+    left += scrollLeft
     return {top, left, placement}
   }
 
   getComponent () {
     const {top, left, placement} = this.computeSize(this.props.placement)
-    const {trigger, title, contentClassName, contentStyle, visible} = this.props
-    const opacity = this.state.visible ? 1 : 0
-    const transform = `scale(${this.state.visible ? 1 : 0.8})`
+    const {trigger, title, contentClassName, contentStyle, showArrow, hideAfterClick, autoWidth} = this.props
+    const width = autoWidth ? this._rect.width + 40 : 'auto'
+    let afterClickAction = () => {}
+    if (hideAfterClick) afterClickAction = this.hide
     this._component = (
-      <PopUp contentClassName={contentClassName} contentStyle={contentStyle} trigger={trigger} title={title} placement={placement} childRect={this.getChildSize} shouldToggle={this.shouldToggle} style={{left, top, transform, opacity}} visible={visible} />
+      <CSSTransition
+        in={this.state.visible}
+        timeout={150}
+        classNames={{
+          enter: styles['ufe-tooltip-pop-up-enter'],
+          enterActive: styles['ufe-tooltip-pop-up-enter-active'],
+          enterDone: styles['ufe-tooltip-pop-up-enter-done'],
+          exit: styles['ufe-tooltip-pop-up-exit'],
+          exitActive: styles['ufe-tooltip-pop-up-exit-active'],
+          exitDone: styles['ufe-tooltip-pop-up-exit-done']
+        }}
+        mountOnEnter
+        // unmountOnExit
+      >
+        <PopUp afterClickAction={afterClickAction} showArrow={showArrow} contentClassName={contentClassName} contentStyle={contentStyle} trigger={trigger} title={title} placement={placement} childRect={this.getChildSize} shouldToggle={this.shouldToggle} style={{left, top, width}} visible={this.state.visible} />
+      </CSSTransition>
     )
 
     this.forceUpdate()
   }
 
   render () {
-    const { children, mouseDelay, placement, title, trigger, contentClassName, contentStyle, onVisibleChange, visible, ...rest } = this.props
+    const { children, mouseDelay, placement, title, trigger, contentClassName, contentStyle, onVisibleChange, visible, showArrow, hideAfterClick, autoWidth, ...rest } = this.props
     const container = document.body
     const portal = createPortal(
       this._component,

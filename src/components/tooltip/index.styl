@@ -10,8 +10,9 @@
   list-style none
   cursor default
   position absolute
-  transition all .1s $ease-out-circ
   z-index $zIndex-high
+  &.ufe-popup-zIndex
+    z-index $zIndex-high+1
   .ufe-tooltip-arrow
     position absolute
     width 0
@@ -65,3 +66,22 @@
       margin-right 8px
     &.ufe-tooltip-content-rightTop, &.ufe-tooltip-content-right, &.ufe-tooltip-content-rightBottom
       margin-left 8px
+
+.ufe-tooltip-pop-up-enter
+  transform-origin 0 0
+  transform scale(0.8)
+  opacity 0
+.ufe-tooltip-pop-up-enter-active
+  transform scale(1)
+  opacity 1
+  transition transform .15s $ease-out-circ, opacity .15s $ease-out-circ
+.ufe-tooltip-pop-up-exit
+  transform-origin 0 0
+  transform scale(1)
+  opacity 1
+.ufe-tooltip-pop-up-exit-active
+  transform scale(0.8)
+  opacity 0
+  transition transform .15s $ease-in-out-circ, opacity .15s $ease-in-out-circ
+.ufe-tooltip-pop-up-exit-done
+  display none
