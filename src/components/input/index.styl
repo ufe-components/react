@@ -1,0 +1,134 @@
+@import('../../assets/styles/variables.styl')
+
+.ufe-input
+  touch-action manipulation
+  appearance none
+  box-sizing border-box
+  margin 0
+  display inline-block
+  width 100%
+  font-size 14px
+  line-height 1.5
+  color $text-color
+  background-color #fff
+  background-image none
+  border $border-base
+  border-radius $border-radius-base
+  transition all .3s
+  &::placeholder
+    color #bfbfbf
+  &:focus
+    outline 0
+    box-shadow 0 0 0 2px rgba(24, 144, 255, .2)
+    border-color $hover-color
+    border-right-width 1px!important
+  &:hover
+    border-color $hover-color
+    border-right-width 1px!important
+  &.ufe-input-large
+    padding 6px 11px
+    height 40px
+    font-size 16px
+  &.ufe-input-small
+    padding 1px 7px
+    height 24px
+  &.ufe-input-default
+    height 32px
+    padding 4px 11px
+
+.ufe-input-wrapper
+  display inline-block
+  vertical-align top
+  width 100%
+  .ufe-input-group
+    box-sizing border-box
+    width 100%
+    margin 0
+    padding 0
+    font-size 14px
+    line-height 1.5
+    color $text-color
+    list-style none
+    position relative
+    display table
+    border-collapse separate
+    border-spacing 0
+    .ufe-input-addon
+      display table-cell
+      vertical-align middle
+      margin 0
+      padding 0 11px
+      font-size 14px
+      font-weight 400
+      line-height 1
+      color $text-color
+      text-align center
+      background-color #fafafa
+      background-image none
+      border $border-base
+      border-radius $border-radius-base
+      transition all .3s
+      &.ufe-input-addon-large
+        padding 0 11px
+        font-size 16px
+      &.ufe-input-addon-small
+        padding 0 7px
+      &.ufe-input-addon-default
+        padding 0 11px
+      &:first-child
+        border-right 0
+        border-bottom-right-radius 0
+        border-top-right-radius 0
+      &:last-child
+        border-left 0
+        border-bottom-left-radius 0
+        border-top-left-radius 0
+    .ufe-input
+      display table-cell
+      float left
+      border-radius 0
+
+.ufe-input-affix-wrapper
+  vertical-align top
+  box-sizing border-box
+  margin 0
+  padding 0
+  display inline-block
+  width 100%
+  font-size 14px
+  line-height 1.5
+  color $text-color
+  list-style none
+  position relative
+  .ufe-input-prefix
+    position absolute
+    top 50%
+    transform translateY(-50%)
+    left 12px
+    line-height 0
+    color $text-color
+  .ufe-input
+    min-height 100%
+    position static
+    &:not(:last-child)
+      padding-right 30px
+    &:not(:first-child)
+      padding-left 30px
+  .ufe-input-suffix
+    position absolute
+    top 50%
+    transform translateY(-50%)
+    right 12px
+    line-height 0
+    color $text-color
+
+textarea.ufe-input
+  max-width 100%
+  height auto
+  vertical-align bottom
+  transition all .3s, height 0s
+  min-height 32px
+  resize vertical
+  overflow-y hidden
+  height 32px
+  padding 4px 11px

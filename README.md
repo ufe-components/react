@@ -15,7 +15,7 @@
 - [ ] checkbox
 - [ ] datepicker
 - [ ] form
-- [ ] input
+- [x] input
 - [ ] inputNumber
 - [ ] mention
 - [ ] rate
