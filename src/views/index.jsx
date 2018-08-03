@@ -7,6 +7,7 @@ import styles from './index.styl'
 import ToolTip from '../components/tooltip/demo'
 import MenuDemo from '../components/menu/demo'
 import Menu from '../components/menu'
+import Input from '../components/input/demo'
 const Item = Menu.Item
 
 class App extends Component {
@@ -35,6 +36,11 @@ class App extends Component {
                 menu
               </NavLink>
             </Item>
+            <Item id='input'>
+              <NavLink activeClassName={styles.active} to='/input'>
+                input
+              </NavLink>
+            </Item>
           </Menu>
           <div className={styles.content}>
             <Route exact path='/' render={() => <Redirect to='/button' />} />
@@ -42,6 +48,7 @@ class App extends Component {
             <Route path='/icon' component={Icon} />
             <Route path='/tooltip' component={ToolTip} />
             <Route path='/menu' component={MenuDemo} />
+            <Route path='/input' component={Input} />
           </div>
         </div>
       </BrowserRouter>
