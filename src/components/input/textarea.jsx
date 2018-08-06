@@ -131,6 +131,14 @@ class Textarea extends Component {
 
   textareaRef = React.createRef()
 
+  focus () {
+    this.textareaRef.current.focus()
+  }
+
+  blur () {
+    this.textareaRef.current.focus()
+  }
+
   reCalculateHeight () {
     const { autosize } = this.props
     if (!autosize || !this.textareaRef.current) return
