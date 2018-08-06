@@ -11,7 +11,8 @@ class CheckBox extends Component {
     className: PropTypes.string,
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
-    indeterminate: PropTypes.bool
+    indeterminate: PropTypes.bool,
+    checked: PropTypes.bool
   }
 
   checkBoxRef = React.createRef()
@@ -62,21 +63,20 @@ class CheckBox extends Component {
   }
 
   render () {
-    const {children, style, className, disabled, onChange, indeterminate, ...rest} = this.props
-    const checked = this.state.checked
+    const {children, style, className, disabled, onChange, indeterminate, checked, ...rest} = this.props
     const wrapper = classnames({
       [styles['ufe-checkbox-wrapper']]: true
     }, className)
     const checkboxClassName = classnames({
       [styles['ufe-checkbox']]: true,
-      [styles['ufe-checkbox-checked']]: !!checked,
+      [styles['ufe-checkbox-checked']]: !!this.state.checked,
       [styles['ufe-checkbox-disabled']]: !!disabled,
       [styles['ufe-checkbox-indeterminate']]: !!indeterminate
     })
     return (
       <label className={wrapper} style={style}>
         <span className={checkboxClassName}>
-          <input ref={this.checkBoxRef} onChange={this.handleChange} checked={!!checked} className={styles['ufe-checkbox-input']} type='checkbox' {...rest} />
+          <input ref={this.checkBoxRef} onChange={this.handleChange} checked={!!this.state.checked} className={styles['ufe-checkbox-input']} type='checkbox' {...rest} />
           <span className={styles['ufe-checkbox-inner']} />
         </span>
         {children !== undefined ? <span>{children}</span> : null }

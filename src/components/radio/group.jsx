@@ -2,26 +2,27 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styles from './index.styl'
 import classnames from 'classnames'
-import Checkbox from './index'
+import Radio from './radio'
 
-class CheckBoxGroup extends Component {
+class RadioGroup extends Component {
   static propTypes = {
     children: PropTypes.any,
     style: PropTypes.object,
     className: PropTypes.string,
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.array,
-    defaultValue: PropTypes.array,
-    options: PropTypes.array.isRequired
+    value: PropTypes.string,
+    defaultValue: PropTypes.any,
+    options: PropTypes.array,
+    size: PropTypes.oneOf(['large', 'small'])
   }
 
   static defaultProps = {
-    defaultValue: []
+    defaultValue: ''
   }
 
   state = {
-    value: this.props.value || this.props.defaultValue || []
+    value: this.props.value || this.props.defaultValue || undefined
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -45,14 +46,9 @@ class CheckBoxGroup extends Component {
     })
   }
 
-  toggleOption = option => {
-    const index = this.state.value.indexOf(option.value)
-    const value = [...this.state.value]
-    if (index === -1) {
-      value.push(option.value)
-    } else {
-      value.splice(index, 1)
-    }
+  toggleOption = e => {
+    const lastValue = this.state.value
+    const value = e.target.value
 
     if (!('value' in this.props)) {
       this.setState({
@@ -60,37 +56,44 @@ class CheckBoxGroup extends Component {
       })
     }
 
-    if (this.props.onChange) {
-      this.props.onChange(value)
+    if (this.props.onChange && value !== lastValue) {
+      this.props.onChange(e)
     }
   }
 
   render () {
-    const { style, className, options, disabled, onChange, ...rest } = this.props
-    let children = this.props.children
+    let { style, className, options, disabled, onChange, defaultValue, value, children, size, ...rest } = this.props
     if (options && options.length > 0) {
       children = this.getOptions(options).map(option => (
-        <Checkbox
+        <Radio
           key={option.value.toString()}
           disabled={disabled ? !!disabled : !!option.disabled}
           value={option.value}
-          checked={this.state.value.indexOf(option.value) !== -1}
-          onChange={() => this.toggleOption(option)}
-          className={styles['ufe-checkbox-group-item']}
+          checked={this.state.value === option.value}
+          onChange={this.toggleOption}
         >
           {option.label}
-        </Checkbox>
+        </Radio>
       ))
+    } else {
+      children = React.Children.map(children, child => {
+        return React.cloneElement(child, {checked: this.state.value === child.props.value, onChange: () => { this.setState({value: child.props.value}) }})
+      })
     }
     const classes = classnames({
-      [styles['ufe-checkbox-group']]: true
+      [styles['ufe-radio-group']]: true,
+      [styles[`ufe-radio-group-${size}`]]: !!size
     }, className)
     return (
-      <div className={classes} style={style} {...rest}>
-        {children}
+      <div className={classes} style={style}>
+        {
+          React.Children.map(children, child => {
+            return React.cloneElement(child, {...rest})
+          })
+        }
       </div>
     )
   }
 }
 
-export default CheckBoxGroup
+export default RadioGroup

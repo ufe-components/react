@@ -12,14 +12,14 @@
 - [ ] steps
 - [ ] autocomplete
 - [ ] cascader
-- [ ] checkbox
+- [x] checkbox
 - [ ] datepicker
 - [ ] form
 - [x] input
 - [ ] inputNumber
 - [ ] mention
 - [ ] rate
-- [ ] radio
+- [x] radio
 - [ ] select
 - [ ] slider
 - [ ] switch
