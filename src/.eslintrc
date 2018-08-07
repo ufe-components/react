@@ -10,6 +10,7 @@
   },
   "extends": ["standard", "standard-react"],
   "rules": {
-    "no-self-compare": 0
+    "no-self-compare": 0,
+    "react/prop-types": ["children", "className", "style"]
   }
 }

@@ -5,7 +5,7 @@ import styles from './index.styl'
 import Menu from '../components/menu'
 const Item = Menu.Item
 
-const components = ['button', 'icon', 'tooltip', 'menu', 'input', 'checkbox', 'radio']
+const components = ['button', 'icon', 'tooltip', 'menu', 'input', 'checkbox', 'radio', 'rate']
 
 class App extends Component {
   render () {
