@@ -1,0 +1,42 @@
+@import('../../assets/styles/variables.styl')
+
+.ufe-rate
+  line-height unset
+  font-size 20px
+  margin 0
+  padding 0
+  list-style none
+  display inline-block
+  outline none
+
+.ufe-star
+  margin 0
+  padding 0
+  display inline-block
+  margin-right 8px
+  position relative
+  transition all .3s
+  cursor pointer
+  &:hover
+    transform scale(1.2)
+  .ufe-star-first, .ufe-star-second
+    user-select none
+    transition all .3s
+    color #e8e8e8
+  .ufe-star-first
+    position absolute
+    left 0
+    top 0
+    width 50%
+    height 100%
+    overflow hidden
+    opacity 0
+  &.ufe-star-half .ufe-star-first
+    opacity 1
+    color $rate-star-color
+  &.ufe-star-full .ufe-star-second
+    color $rate-star-color
+  &.ufe-star-disabled
+    cursor default
+    &:hover
+      transform scale(1)

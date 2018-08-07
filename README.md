@@ -18,7 +18,7 @@
 - [x] input
 - [ ] inputNumber
 - [ ] mention
-- [ ] rate
+- [x] rate
 - [x] radio
 - [ ] select
 - [ ] slider
