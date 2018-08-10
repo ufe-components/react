@@ -15,10 +15,11 @@ class ToolTip extends Component {
     contentClassName: PropTypes.string,
     contentStyle: PropTypes.object,
     visible: PropTypes.bool,
-    onVisibleChange: PropTypes.func,
     showArrow: PropTypes.bool,
     hideAfterClick: PropTypes.bool,
-    autoWidth: PropTypes.bool
+    autoWidth: PropTypes.bool,
+    onShow: PropTypes.func,
+    onHide: PropTypes.func
   }
 
   static defaultProps = {
@@ -38,9 +39,13 @@ class ToolTip extends Component {
 
   _toggle = false
 
-  hide = () => {
+  hide = e => {
     this.setState({
       visible: false
+    }, () => {
+      if (typeof this.props.onHide === 'function') {
+        this.props.onHide(e)
+      }
     })
   }
 
@@ -49,8 +54,8 @@ class ToolTip extends Component {
     this.setState(() => ({
       visible: true
     }), () => {
-      if (typeof this.props.onVisibleChange === 'function') {
-        this.props.onVisibleChange(this.state.visible)
+      if (typeof this.props.onShow === 'function') {
+        this.props.onShow(e)
       }
     })
   }
@@ -59,53 +64,28 @@ class ToolTip extends Component {
     if (this._toggle) return
     e.preventDefault()
     document.body.removeEventListener('click', this.leave)
-    this.setState(() => ({
-      visible: false
-    }), () => {
-      if (typeof this.props.onVisibleChange === 'function') {
-        this.props.onVisibleChange(this.state.visible)
-      }
-    })
+    this.hide(e)
   }
 
-  shouldToggle = (toggle) => {
+  shouldToggle = (e, toggle) => {
     if (!this.state.visible) return
     this._toggle = toggle
     if (!this._toggle && this.state.visible) {
-      this.setState(() => ({
-        visible: false
-      }), () => {
-        if (typeof this.props.onVisibleChange === 'function') {
-          this.props.onVisibleChange(this.state.visible)
-        }
-      })
+      this.hide(e)
     }
   }
 
   handleClickShow = (e) => {
-    e.stopPropagation()
     if (!this.state.visible) {
       document.body.addEventListener('click', this.handleClickHide)
+      this.show(e)
     }
-    this.setState({
-      visible: !this.state.visible
-    }, () => {
-      if (typeof this.props.onVisibleChange === 'function') {
-        this.props.onVisibleChange(this.state.visible)
-      }
-    })
   }
 
   handleClickHide = (e) => {
     e.preventDefault()
     document.body.removeEventListener('click', this.handleClickHide)
-    this.setState(() => ({
-      visible: false
-    }), () => {
-      if (typeof this.props.onVisibleChange === 'function') {
-        this.props.onVisibleChange(this.state.visible)
-      }
-    })
+    this.hide(e)
   }
 
   handleContextMenuShow = (e) => {
@@ -113,26 +93,14 @@ class ToolTip extends Component {
     if (!this.state.visible) {
       document.body.addEventListener('click', this.handleContextMenuHide)
     }
-    this.setState(() => ({
-      visible: true
-    }), () => {
-      if (typeof this.props.onVisibleChange === 'function') {
-        this.props.onVisibleChange(this.state.visible)
-      }
-    })
+    this.show(e)
   }
 
   handleContextMenuHide = (e) => {
     e.preventDefault()
     document.body.removeEventListener('contextmenu', this.noop)
     document.body.removeEventListener('click', this.handleContextMenuHide)
-    this.setState(() => ({
-      visible: false
-    }), () => {
-      if (typeof this.props.onVisibleChange === 'function') {
-        this.props.onVisibleChange(this.state.visible)
-      }
-    })
+    this.hide(e)
   }
 
   noop = (e) => {
@@ -192,10 +160,10 @@ class ToolTip extends Component {
     return null
   }
 
-  componentDidUpdate (_, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     const rect = findDOMNode(this).getBoundingClientRect()
 
-    if (this._rect && this._rect.left === rect.left && this._rect.right === rect.right && this._rect.top === rect.top && this._rect.bottom === rect.bottom && this._rect.width === rect.width && this._rect.height === rect.height && prevState.visible === this.state.visible) {
+    if (this._rect && this._rect.left === rect.left && this._rect.right === rect.right && this._rect.top === rect.top && this._rect.bottom === rect.bottom && this._rect.width === rect.width && this._rect.height === rect.height && prevState.visible === this.state.visible && prevProps.title === this.props.title) {
       return
     }
 
@@ -316,9 +284,14 @@ class ToolTip extends Component {
   getComponent () {
     const {top, left, placement} = this.computeSize(this.props.placement)
     const {trigger, title, contentClassName, contentStyle, showArrow, hideAfterClick, autoWidth} = this.props
-    const width = autoWidth ? this._rect.width + 40 : 'auto'
+    const width = autoWidth ? this._rect.width : 'auto'
     let afterClickAction = () => {}
-    if (hideAfterClick) afterClickAction = this.hide
+    if (hideAfterClick) {
+      afterClickAction = e => {
+        document.body.removeEventListener('click', this.handleClickHide)
+        this.hide(e)
+      }
+    }
     this._component = (
       <CSSTransition
         in={this.state.visible}
@@ -342,7 +315,7 @@ class ToolTip extends Component {
   }
 
   render () {
-    const { children, mouseDelay, placement, title, trigger, contentClassName, contentStyle, onVisibleChange, visible, showArrow, hideAfterClick, autoWidth, ...rest } = this.props
+    const { children, mouseDelay, placement, title, trigger, contentClassName, contentStyle, onShow, onHide, visible, showArrow, hideAfterClick, autoWidth, ...rest } = this.props
     const container = document.body
     const portal = createPortal(
       this._component,

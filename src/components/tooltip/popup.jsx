@@ -24,26 +24,24 @@ class Popup extends Component {
   }
 
   handleMouseLeave = e => {
-    // e.stopPropagation()
     if (this.props.trigger === 'hover') {
-      this.props.shouldToggle(false)
+      this.props.shouldToggle(e, false)
     }
   }
 
   handleMouseEnter = e => {
-    // e.stopPropagation()
-    if (this.props.trigger === 'hover') { this.props.shouldToggle(true) }
+    if (this.props.trigger === 'hover') { this.props.shouldToggle(e, true) }
   }
 
   handleClick = (e) => {
-    if (this.props.trigger === 'click') {
-      e.stopPropagation()
-    }
+    // if (this.props.trigger === 'click') {
+    //   e.stopPropagation()
+    // }
     if (this.props.trigger === 'hover') {
-      this.props.shouldToggle(false)
+      this.props.shouldToggle(e, false)
     }
     if (this.props.visible) {
-      this.props.afterClickAction()
+      this.props.afterClickAction(e)
     }
   }
 
