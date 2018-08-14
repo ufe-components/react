@@ -6,7 +6,7 @@
   display inline-block
   position relative
   cursor pointer
-  height 32px
+  min-height 32px
   outline none
   user-select none
   background-color #fff
@@ -14,6 +14,9 @@
   border $border-base
   transition all .3s $ease-in-out
   padding 0 11px
+  position relative
+  &.ufe-select-multiple
+    padding 0 5px
   &:hover
     border-color $hover-color
   &.ufe-select-selection, &:focus, &:active
@@ -21,16 +24,15 @@
     outline 0
     box-shadow 0 0 0 2px rgba(24, 144, 255, 0.2)
   .ufe-select-input
+    display inline-block
     outline none
     border none
     width 100%
     height 30px
     line-height 30px
+    vertical-align middle
     &::placeholder
       color #bfbfbf
-  span
-    line-height 30px
-    vertical-align middle
   i
     color $disable-color
     position absolute
@@ -41,9 +43,55 @@
     color $disable-color
     background-color $disabled-bg
     cursor not-allowed
+    vertical-align middle
+    line-height 30px
     &:hover, &.ufe-select-selection, &:focus, &:active
       border $border-base
       box-shadow none
+  .ufe-select-tags
+    padding 0
+    margin 0
+    display inline-block
+    vertical-align middle
+    clearfix()
+    .ufe-select-input
+      float left
+    .ufe-select-tags-item
+      margin-top 3px
+      height 24px
+      line-height 22px
+      color $text-color
+      background-color $background-color-light
+      border $menu-border
+      border-radius $border-radius-sm
+      cursor default
+      float left
+      margin-right 4px
+      max-width 99%
+      position relative
+      overflow hidden
+      transition padding .3s $ease-in-out
+      padding 0 20px 0 10px
+      .ufe-select-tags-item-content
+        display inline-block
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
+        max-width 100%
+        transition margin .3s $ease-in-out
+      .ufe-select-tags-item-icon
+        line-height 24px
+        font-size 12px
+        text-align center
+        color $title-color
+        cursor pointer
+        transition all .3s
+        display inline-block
+        transform scale(0.83333333) rotate(0deg)
+        position absolute
+        right 4px
+        &:hover
+          color #404040
 
 .ufe-select-tooltip-content
   reset-component()
@@ -55,7 +103,7 @@
 .ufe-selelct-list
   outline none
   max-height 250px
-  overflow hidden
+  overflow auto
   text-align left
   padding 0
   margin-bottom 0
@@ -84,6 +132,8 @@
     background-color $background-color-light
     font-weight 600
     color $text-color
+    &:hover, &.ufe-select-item-hover
+      background-color $menu-item-selected-bgc
   &.ufe-select-item-disabled
     color $disable-color
     cursor not-allowed
@@ -91,6 +141,21 @@
       background-color #fff
       cursor not-allowed
       color $disable-color
+  &.ufe-select-item-multiple
+    position relative
+    i
+      position absolute
+      right 12px
+      display none
+      color #ddd
+      line-height 22px
+    &:hover
+      i
+        display inline-block
+    &.ufe-select-item-selected
+      i
+        display inline-block
+        color $primary-color
 
 .ufe-select-group
   .ufe-select-group-title

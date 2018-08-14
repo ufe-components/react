@@ -5,9 +5,7 @@ import PropTypes from 'prop-types'
 
 class OptionGroup extends Component {
   static propTypes = {
-    onChange: PropTypes.func,
-    label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    selectedValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }
 
   handleClick = e => {
@@ -15,7 +13,7 @@ class OptionGroup extends Component {
   }
 
   render () {
-    const {children, label, className, onChange, selectedValue, ...rest} = this.props
+    const {children, label, className, ...rest} = this.props
     const groupClass = classnames({
       [styles['ufe-select-group']]: true
     }, className)
@@ -29,12 +27,9 @@ class OptionGroup extends Component {
       <li onClick={this.handleClick} {...rest} className={groupClass}>
         <div className={groupTitleClass}>{label}</div>
         <ul className={groupListClass}>
-          {React.Children.map(children, child => {
-            return React.cloneElement(child, {
-              onChange,
-              selectedValue
-            })
-          })}
+          {
+            children
+          }
         </ul>
       </li>
     )
