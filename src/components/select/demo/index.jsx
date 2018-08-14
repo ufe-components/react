@@ -4,6 +4,11 @@ import Select from '../index'
 const Option = Select.Option
 const OptionGroup = Select.OptionGroup
 
+const children = []
+for (let i = 10; i < 36; i++) {
+  children.push(<Option value={i.toString(36) + i} key={i.toString(36) + i}>{i.toString(36) + i}</Option>)
+}
+
 class Demo extends Component {
   state = {
     value: 'jack'
@@ -54,6 +59,11 @@ class Demo extends Component {
             <Option value='jack'>jack</Option>
             <Option value='lucy'>lucy</Option>
             <Option value='sonacy'>sonacy</Option>
+          </Select>
+        </div>
+        <div style={{margin: 20, display: 'inline-block'}}>
+          <Select mode='multiple' style={{width: 209}} placeholder='please select'>
+            {children}
           </Select>
         </div>
       </div>

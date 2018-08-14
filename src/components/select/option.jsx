@@ -2,14 +2,17 @@ import React, { Component } from 'react'
 import styles from './index.styl'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import Icon from '../icon'
 
 class Option extends Component {
   static propTypes = {
     onChange: PropTypes.func,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    selectedValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    selectedValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.arrayOf(PropTypes.string), PropTypes.arrayOf(PropTypes.number)]),
     disabled: PropTypes.bool,
-    isHover: PropTypes.bool
+    isHover: PropTypes.bool,
+    multiple: PropTypes.bool,
+    changeItemHover: PropTypes.func
   }
 
   state = {
@@ -32,16 +35,25 @@ class Option extends Component {
     }
   }
 
+  handleEnter = e => {
+    this.props.changeItemHover(this.props.value)
+  }
+
   render () {
-    const { className, value, style, onChange, children, selectedValue, disabled, isHover, ...rest } = this.props
+    const { className, value, style, onChange, children, selectedValue, disabled, isHover, multiple, changeItemHover, ...rest } = this.props
+    const isSelected = Array.isArray(selectedValue) ? selectedValue.includes(value) : selectedValue === value
     const classes = classnames({
       [styles['ufe-select-item']]: true,
-      [styles['ufe-select-item-selected']]: selectedValue === value,
+      [styles['ufe-select-item-selected']]: isSelected,
       [styles['ufe-select-item-disabled']]: disabled,
+      [styles['ufe-select-item-multiple']]: multiple,
       [styles['ufe-select-item-hover']]: this.state.isHover
     }, className)
     return (
-      <li {...rest} className={classes} style={style} onClick={this.handleChange}>{children}</li>
+      <li onMouseEnter={this.handleEnter} {...rest} className={classes} style={style} onClick={this.handleChange}>
+        {children}
+        {multiple ? <Icon type='check' /> : null}
+      </li>
     )
   }
 }
