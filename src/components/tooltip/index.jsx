@@ -16,7 +16,6 @@ class ToolTip extends Component {
     contentStyle: PropTypes.object,
     visible: PropTypes.bool,
     showArrow: PropTypes.bool,
-    hideAfterClick: PropTypes.bool,
     autoWidth: PropTypes.bool,
     onShow: PropTypes.func,
     onHide: PropTypes.func
@@ -29,8 +28,7 @@ class ToolTip extends Component {
     trigger: 'hover',
     contentStyle: {},
     showArrow: true,
-    autoWidth: false,
-    hideAfterClick: false
+    autoWidth: false
   }
 
   state = {
@@ -38,6 +36,22 @@ class ToolTip extends Component {
   }
 
   _toggle = false
+
+  pureHide = (e, cb) => {
+    this.setState({
+      visible: false
+    }, () => {
+      cb && typeof cb === 'function' && cb()
+    })
+  }
+
+  pureShow = (e, cb) => {
+    this.setState({
+      visible: true
+    }, () => {
+      cb && typeof cb === 'function' && cb()
+    })
+  }
 
   hide = e => {
     this.setState({
@@ -63,7 +77,7 @@ class ToolTip extends Component {
   leave = (e) => {
     if (this._toggle) return
     e.preventDefault()
-    document.body.removeEventListener('click', this.leave)
+    document.removeEventListener('click', this.leave)
     this.hide(e)
   }
 
@@ -77,29 +91,28 @@ class ToolTip extends Component {
 
   handleClickShow = (e) => {
     if (!this.state.visible) {
-      document.body.addEventListener('click', this.handleClickHide)
+      document.addEventListener('click', this.handleClickHide)
       this.show(e)
     }
   }
 
   handleClickHide = (e) => {
-    e.preventDefault()
-    document.body.removeEventListener('click', this.handleClickHide)
+    document.removeEventListener('click', this.handleClickHide)
     this.hide(e)
   }
 
   handleContextMenuShow = (e) => {
-    document.body.addEventListener('contextmenu', this.noop)
+    document.addEventListener('contextmenu', this.noop)
     if (!this.state.visible) {
-      document.body.addEventListener('click', this.handleContextMenuHide)
+      document.addEventListener('click', this.handleContextMenuHide)
     }
     this.show(e)
   }
 
   handleContextMenuHide = (e) => {
     e.preventDefault()
-    document.body.removeEventListener('contextmenu', this.noop)
-    document.body.removeEventListener('click', this.handleContextMenuHide)
+    document.removeEventListener('contextmenu', this.noop)
+    document.removeEventListener('click', this.handleContextMenuHide)
     this.hide(e)
   }
 
@@ -115,9 +128,9 @@ class ToolTip extends Component {
       dom.addEventListener('mouseenter', this.show)
       dom.addEventListener('mouseleave', this.leave)
     }
-    if (this.props.trigger === 'click') {
-      dom.addEventListener('click', this.handleClickShow)
-    }
+    // if (this.props.trigger === 'click') {
+    //   dom.addEventListener('click', this.handleClickShow)
+    // }
     if (this.props.trigger === 'focus') {
       dom.addEventListener('focusin', this.show)
       dom.addEventListener('focusout', this.leave)
@@ -134,9 +147,9 @@ class ToolTip extends Component {
       dom.removeEventListener('mouseenter', this.show)
       dom.removeEventListener('mouseleave', this.leave)
     }
-    if (this.props.trigger === 'click') {
-      dom.removeEventListener('click', this.handleClickShow)
-    }
+    // if (this.props.trigger === 'click') {
+    //   dom.removeEventListener('click', this.handleClickShow)
+    // }
     if (this.props.trigger === 'focus') {
       dom.removeEventListener('focusin', this.show)
       dom.removeEventListener('focusout', this.leave)
@@ -283,15 +296,9 @@ class ToolTip extends Component {
 
   getComponent () {
     const {top, left, placement} = this.computeSize(this.props.placement)
-    const {trigger, title, contentClassName, contentStyle, showArrow, hideAfterClick, autoWidth} = this.props
+    const {trigger, title, contentClassName, contentStyle, showArrow, autoWidth} = this.props
     const width = autoWidth ? this._rect.width : 'auto'
-    let afterClickAction = () => {}
-    if (hideAfterClick) {
-      afterClickAction = e => {
-        document.body.removeEventListener('click', this.handleClickHide)
-        this.hide(e)
-      }
-    }
+
     this._component = (
       <CSSTransition
         in={this.state.visible}
@@ -307,7 +314,7 @@ class ToolTip extends Component {
         mountOnEnter
         // unmountOnExit
       >
-        <PopUp afterClickAction={afterClickAction} showArrow={showArrow} contentClassName={contentClassName} contentStyle={contentStyle} trigger={trigger} title={title} placement={placement} childRect={this.getChildSize} shouldToggle={this.shouldToggle} style={{left, top, width}} visible={this.state.visible} />
+        <PopUp showArrow={showArrow} contentClassName={contentClassName} contentStyle={contentStyle} trigger={trigger} title={title} placement={placement} childRect={this.getChildSize} shouldToggle={this.shouldToggle} style={{left, top, width}} visible={this.state.visible} />
       </CSSTransition>
     )
 
@@ -315,14 +322,17 @@ class ToolTip extends Component {
   }
 
   render () {
-    const { children, mouseDelay, placement, title, trigger, contentClassName, contentStyle, onShow, onHide, visible, showArrow, hideAfterClick, autoWidth, ...rest } = this.props
+    const { children, mouseDelay, placement, title, trigger, contentClassName, contentStyle, onShow, onHide, visible, showArrow, autoWidth, ...rest } = this.props
     const container = document.body
     const portal = createPortal(
       this._component,
       container
     )
     const child = React.Children.only(children)
-    const tooltip = React.cloneElement(child, {key: 'tooltip', ...rest})
+    const props = this.props.trigger === 'click'
+      ? {onClick: this.handleClickShow} : {}
+
+    const tooltip = React.cloneElement(child, {key: 'tooltip', ...props, ...rest})
     return [
       tooltip,
       portal

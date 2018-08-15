@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import styles from './index.styl'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
@@ -31,8 +32,20 @@ class Option extends Component {
   handleChange = e => {
     const { value, disabled, onChange } = this.props
     if (!disabled) {
-      onChange(value)
+      onChange(e, value)
+    } else {
+      e.stopPropagation()
     }
+  }
+
+  componentDidMount () {
+    const dom = ReactDOM.findDOMNode(this)
+    dom.addEventListener('click', this.handleChange)
+  }
+
+  componentWillUnmount () {
+    const dom = ReactDOM.findDOMNode(this)
+    dom.removeEventListener('click', this.handleChange)
   }
 
   handleEnter = e => {
@@ -50,7 +63,7 @@ class Option extends Component {
       [styles['ufe-select-item-hover']]: this.state.isHover
     }, className)
     return (
-      <li onMouseEnter={this.handleEnter} {...rest} className={classes} style={style} onClick={this.handleChange}>
+      <li onMouseEnter={this.handleEnter} {...rest} className={classes} style={style}>
         {children}
         {multiple ? <Icon type='check' /> : null}
       </li>

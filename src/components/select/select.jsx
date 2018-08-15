@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Tooltip from '../tooltip'
-import { CSSTransition } from 'react-transition-group'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styles from './index.styl'
 import classnames from 'classnames'
 import Icon from '../icon'
+import TagItem from './tag-item'
 import Option from './option'
 
 class Select extends Component {
@@ -43,17 +44,19 @@ class Select extends Component {
     value: this.props.value ? this.props.value : this.props.defaultValue ? this.props.defaultValue : this.props.mode ? [] : '',
     inputValue: this.props.mode ? '' : this.props.value || this.props.defaultValue || '',
     itemIndex: 0,
-    placeholder: this.props.placeholder || ''
+    placeholder: this.props.placeholder || '',
+    additionTags: []
   }
 
   handleShow = e => {
+    this.input.current.focus()
     if (this.props.showSearch) {
       let value = this.state.value
       let placeholder = value || this.state.placeholder
       this.setState({
-        visible: true,
-        value: '',
-        placeholder
+        inputValue: '',
+        placeholder,
+        visible: true
       })
       return
     }
@@ -63,38 +66,35 @@ class Select extends Component {
   }
 
   handleHide = e => {
-    if (this.props.showSearch) {
-      const values = React.Children.map(this.props.children, child => {
-        return child.props.value
-      })
-      let value = this.state.value
-      let placeholder = this.props.placeholder
-
-      if (values.indexOf(value) === -1) {
-        if (values.indexOf(this.state.placeholder) !== -1) {
-          value = this.state.placeholder
-        } else {
-          value = ''
-        }
-      }
-
-      this.setState({
-        visible: false,
-        placeholder,
-        value
-      })
-      return
-    }
     this.setState({
       visible: false
     })
   }
 
-  handleItemClick = optionValue => {
+  afterHide = node => {
+    if (this.props.showSearch) {
+      let placeholder = this.props.placeholder
+      let inputValue = this.state.value
+      this.setState({
+        placeholder,
+        inputValue
+      })
+    }
+
+    if (this.props.mode) {
+      this.setState({
+        inputValue: ''
+      })
+    }
+  }
+
+  handleItemClick = (e, optionValue) => {
     let value = optionValue
     let placeholder = this.state.placeholder
     let inputValue = ''
     if (this.props.mode) {
+      e.stopPropagation()
+      this.input.current.focus()
       let index = this.state.value.indexOf(value)
       if (index !== -1) {
         value = [...this.state.value]
@@ -126,10 +126,13 @@ class Select extends Component {
 
   handleInputChange = e => {
     let inputValue = e.target.value
-
+    if (!this.state.visible) {
+      this.tooltip.current.pureShow(e)
+    }
     this.setState({
       inputValue,
-      itemIndex: 0
+      itemIndex: 0,
+      visible: true
     }, () => {
       this.canDelete = !this.state.inputValue
       this.upItemIndex = 0
@@ -141,10 +144,12 @@ class Select extends Component {
   }
 
   keyboardSelect = e => {
-    const children = this.getNestedChildren(this.props.children)
+    const children = this.getTotalChildren(this.props.children)
     const length = children.length
     let itemIndex = this.state.itemIndex
     if (e.keyCode === 38) { // up
+      if (!this.state.visible) return
+      e.preventDefault()
       itemIndex--
       if (itemIndex < 0) itemIndex = length - 1
       if (itemIndex < this.upItemIndex) {
@@ -156,7 +161,15 @@ class Select extends Component {
         this.downItemIndex = length - 1
         this.upItemIndex = length - 8
       }
+      this.setState({
+        itemIndex
+      })
     } else if (e.keyCode === 40) { // down
+      if (!this.state.visible) {
+        this.tooltip.current.handleClickShow(e)
+        return
+      }
+      e.preventDefault()
       itemIndex++
       if (itemIndex >= length) itemIndex = 0
       if (itemIndex > this.downItemIndex) {
@@ -168,13 +181,30 @@ class Select extends Component {
         this.upItemIndex = 0
         this.downItemIndex = 7
       }
-    } else if (e.keyCode === 13 && itemIndex >= 0 && itemIndex < length) {
+      this.setState({
+        itemIndex
+      })
+    } else if (e.keyCode === 13 && itemIndex >= 0 && itemIndex < length) { // enter
+      if (!this.state.visible) {
+        this.tooltip.current.handleClickShow(e)
+        return
+      }
       let value = children[itemIndex].props.value
       let placeholder = this.state.placeholder
+      let additionTags = this.state.additionTags.slice()
       let inputValue = ''
       if (this.props.mode) {
+        if (this.props.mode === 'tags' && children[itemIndex].isInput) {
+          // add input into addition
+          additionTags.push(this.state.inputValue)
+        }
         let index = this.state.value.indexOf(value)
         if (index !== -1) {
+          if (children[itemIndex].isAddition) {
+            // remove from addition
+            const additionIndex = additionTags.indexOf(value)
+            additionTags.splice(additionIndex, 1)
+          }
           value = [...this.state.value]
           value.splice(index, 1)
         } else {
@@ -192,11 +222,14 @@ class Select extends Component {
         itemIndex,
         value,
         placeholder,
-        inputValue
+        inputValue,
+        additionTags
       }, () => {
         if (!this.props.mode) {
           this.tooltip.current.hide()
           this.input.current.blur()
+        } else {
+          this.canDelete = true
         }
         if (this.props.onSelect) {
           this.props.onSelect(children[itemIndex].props.value)
@@ -205,23 +238,30 @@ class Select extends Component {
           this.props.onChange(children[itemIndex].props.value)
         }
       })
-      return
-    } else if (e.keyCode === 27) {
-      this.tooltip.current.hide()
+    } else if (e.keyCode === 27) { // escape
+      this.tooltip.current.handleClickHide(e)
       this.input.current.blur()
-    } else if (e.keyCode === 8 && this.props.mode) {
+    } else if (e.keyCode === 8 && this.props.mode) { // back
       if (this.canDelete) {
+        // check for is addition
+        const additionTags = this.state.additionTags.slice()
+        const additionIndex = additionTags.indexOf(this.state.value[this.state.value.length - 1])
+        if (additionIndex !== -1) {
+          additionTags.splice(additionIndex, 1)
+        }
+
         const value = this.state.value.slice(0, this.state.value.length - 1)
         let placeholder = value.length > 0 ? '' : this.props.placeholder
         this.setState({
           value,
-          placeholder
+          placeholder,
+          additionTags
         })
       }
+    } else if (e.keyCode === 9 && (this.props.mode || this.props.showSearch)) { // tab
+      this.tooltip.current.handleClickHide(e)
+      this.input.current.blur()
     }
-    this.setState({
-      itemIndex
-    })
   }
 
   getNestedChildren (children) {
@@ -242,6 +282,31 @@ class Select extends Component {
       }
     })
     return ret
+  }
+
+  getTotalChildren (children) {
+    const options = this.getNestedChildren(children)
+    const inputValue = this.state.inputValue
+    const tags = this.state.additionTags
+    if (this.props.mode === 'tags') {
+      if (inputValue) {
+        const index = options.findIndex(child => child.props.value === inputValue)
+        const additionIndex = tags.indexOf(inputValue)
+        if (index === -1 && additionIndex === -1) {
+          options.unshift({props: {[this.props.optionFilterProp]: inputValue}, isInput: true})
+        }
+      }
+
+      if (tags.length > 0) {
+        tags.forEach(tag => {
+          const option = {props: {[this.props.optionFilterProp]: tag}, isAddition: true}
+          if (this.props.filterOption(inputValue, option)) {
+            options.push(option)
+          }
+        })
+      }
+    }
+    return options
   }
 
   getRenderedChildren (children, options) {
@@ -278,7 +343,7 @@ class Select extends Component {
   }
 
   changeItemHover = value => {
-    const options = this.getNestedChildren(this.props.children)
+    const options = this.getTotalChildren(this.props.children)
     const itemIndex = options.findIndex(item => item.props.value === value)
     this.setState({
       itemIndex
@@ -287,38 +352,99 @@ class Select extends Component {
 
   removeItem = (e, value) => {
     e.stopPropagation()
+    const additionTags = this.state.additionTags.slice()
+    const additionIndex = additionTags.indexOf(value)
+    if (additionIndex !== -1) {
+      additionTags.splice(additionIndex, 1)
+    }
     const values = this.state.value.slice()
     const index = values.indexOf(value)
     values.splice(index, 1)
     let placeholder = values.length > 0 ? '' : this.props.placeholder
+    if (this.state.visible) {
+      this.input.current.focus()
+    }
     this.setState({
       value: values,
-      placeholder
+      placeholder,
+      additionTags
+    })
+  }
+
+  getInputValueOption () {
+    const inputValue = this.state.inputValue
+    const nestedValues = this.getNestedChildren(this.props.children)
+    const tags = this.state.additionTags
+    if (!inputValue) return null
+    const index = nestedValues.findIndex(child => child.props.value === inputValue)
+    const additionIndex = tags.indexOf(inputValue)
+    if (index === -1 && additionIndex === -1) {
+      return (
+        <Option multiple onChange={this.handleItemClick} selectedValue={this.state.value} changeItemHover={this.changeItemHover} isHover={this.state.itemIndex === 0} key={inputValue} value={inputValue}>{inputValue}</Option>
+      )
+    } else {
+      return null
+    }
+  }
+
+  getAdditionChildren () {
+    const children = this.getTotalChildren(this.props.children)
+
+    return this.state.additionTags.map(tag => {
+      const option = {props: {[this.props.optionFilterProp]: tag}, isAddition: true}
+      if (this.props.filterOption(this.state.inputValue, option)) {
+        const index = children.findIndex(child => child.props.value === tag)
+        return (
+          <Option multiple onChange={this.handleItemClick} selectedValue={this.state.value} changeItemHover={this.changeItemHover} isHover={this.state.itemIndex === index} key={tag} value={tag}>{tag}</Option>
+        )
+      }
     })
   }
 
   renderChildren = children => {
-    const options = this.getNestedChildren(children)
+    const options = this.getTotalChildren(children)
     return (
       <CSSTransition in={this.state.visible} timeout={150} classNames={{
         enter: styles['ufe-select-list-enter'],
         enterActive: styles['ufe-select-list-enter-active'],
         exit: styles['ufe-select-list-exit'],
         exitActive: styles['ufe-select-list-exit-active']
-      }} unmountOnExit>
+      }} onExited={this.afterHide} unmountOnExit>
         <ul ref={this.list} className={styles['ufe-selelct-list']} onMouseLeave={this.removeHoverIndex}>
           {
-            options.length === 0
-              ? <Option value='disabled' disabled>{this.props.notFoundContent}</Option>
-              : this.getRenderedChildren(children, options)
+            this.props.mode === 'tags'
+              ? [
+                this.getInputValueOption(),
+                this.getRenderedChildren(children, options),
+                this.getAdditionChildren()
+              ]
+              : options.length === 0
+                ? <Option value='disabled' disabled>{this.props.notFoundContent}</Option>
+                : this.getRenderedChildren(children, options)
           }
         </ul>
       </CSSTransition>
     )
   }
 
+  handleItemExit = node => {
+    if (this.state.value.length === 0) {
+      this.input.current.style.width = 0
+    }
+    this.input.current.blur()
+  }
+
+  handleItemExited = node => {
+    if (this.state.value.length === 0) {
+      this.input.current.style.width = '100%'
+    }
+    this.input.current.focus()
+  }
+
   handleBlur = e => {
-    this.tooltip.current.hide()
+    if (!this.props.mode && this.state.visible) {
+      this.tooltip.current.handleClickHide(e)
+    }
   }
 
   render () {
@@ -350,25 +476,31 @@ class Select extends Component {
     } : {}
 
     return (
-      <Tooltip ref={this.tooltip} trigger='click' onShow={this.handleShow} onHide={this.handleHide} autoWidth contentClassName={contentClassName} showArrow={false} placement={placement} title={this.renderChildren(children)} hideAfterClick>
-        <div onBlur={this.handleBlur} className={classes} {...rest} style={style}>
+      <Tooltip ref={this.tooltip} trigger='click' onShow={this.handleShow} onHide={this.handleHide} autoWidth contentClassName={contentClassName} showArrow={false} placement={placement} title={this.renderChildren(children)}>
+        <div className={classes} {...rest} style={style}>
           {
             mode
               ? <ul className={styles['ufe-select-tags']}>
-                {
-                  this.state.value.map(item => {
-                    return (
-                      <li className={styles['ufe-select-tags-item']} key={item}>
-                        <div className={styles['ufe-select-tags-item-content']}>{item}</div>
-                        <Icon onClick={e => this.removeItem(e, item)} className={styles['ufe-select-tags-item-icon']} type='times' />
-                      </li>
-                    )
-                  })
-                }
-                <input style={inputStyle} tabIndex={-1} readOnly={mode ? false : !showSearch} ref={this.input} className={styles['ufe-select-input']} placeholder={this.state.placeholder} onChange={this.handleInputChange} onKeyDown={this.keyboardSelect} value={this.state.inputValue} />
+                <TransitionGroup component={null} >
+                  {
+                    this.state.value.map(item => {
+                      return (
+                        <CSSTransition onExit={this.handleItemExit} onExited={this.handleItemExited} key={item} timeout={300} classNames={{
+                          enter: styles['ufe-select-tags-item-move-enter'],
+                          enterActive: styles['ufe-select-tags-item-move-enter-active'],
+                          exit: styles['ufe-select-tags-item-move-exit'],
+                          exitActive: styles['ufe-select-tags-item-move-exit-active']
+                        }}>
+                          <TagItem item={item} removeItem={this.removeItem} />
+                        </CSSTransition>
+                      )
+                    })
+                  }
+                </TransitionGroup>
+                <input onBlur={this.handleBlur} style={inputStyle} readOnly={mode ? false : !showSearch} ref={this.input} className={styles['ufe-select-input']} placeholder={this.state.placeholder} onChange={this.handleInputChange} onKeyDown={this.keyboardSelect} value={this.state.inputValue} />
               </ul>
               : [
-                <CSSTransition key='angle' in={this.state.visible} timeout={150} classNames={{
+                <CSSTransition key='angle' in={this.state.visible} timeout={{enter: 300, exit: 150}} classNames={{
                   enter: styles['ufe-select-icon-enter'],
                   enterActive: styles['ufe-select-icon-enter-active'],
                   enterDone: styles['ufe-select-icon-enter-done'],
@@ -378,7 +510,7 @@ class Select extends Component {
                 }}>
                   <Icon type='angle-down' />
                 </CSSTransition>,
-                <input key='input' style={inputStyle} tabIndex={-1} readOnly={mode ? false : !showSearch} ref={this.input} className={styles['ufe-select-input']} placeholder={this.state.placeholder} onChange={this.handleInputChange} onKeyDown={this.keyboardSelect} value={this.state.inputValue} />
+                <input onBlur={this.handleBlur} key='input' style={inputStyle} readOnly={mode ? false : !showSearch} ref={this.input} className={styles['ufe-select-input']} placeholder={this.state.placeholder} onChange={this.handleInputChange} onKeyDown={this.keyboardSelect} value={this.state.inputValue} />
               ]
           }
 
