@@ -15,8 +15,7 @@ class Popup extends Component {
     contentStyle: PropTypes.object,
     contentClassName: PropTypes.string,
     visible: PropTypes.bool,
-    showArrow: PropTypes.bool,
-    afterClickAction: PropTypes.func
+    showArrow: PropTypes.bool
   }
 
   static defaultProps = {
@@ -34,14 +33,8 @@ class Popup extends Component {
   }
 
   handleClick = (e) => {
-    // if (this.props.trigger === 'click') {
-    //   e.stopPropagation()
-    // }
     if (this.props.trigger === 'hover') {
       this.props.shouldToggle(e, false)
-    }
-    if (this.props.visible) {
-      this.props.afterClickAction(e)
     }
   }
 
@@ -66,7 +59,7 @@ class Popup extends Component {
   }
 
   render () {
-    const { title, className, shouldToggle, childRect, placement, trigger, contentClassName, contentStyle, visible, showArrow, afterClickAction, ...rest } = this.props
+    const { title, className, shouldToggle, childRect, placement, trigger, contentClassName, contentStyle, visible, showArrow, ...rest } = this.props
     const classes = classNames({
       [styles['ufe-popup']]: true,
       [styles['ufe-popup-zIndex']]: visible

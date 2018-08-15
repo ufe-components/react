@@ -121,7 +121,7 @@ class MenuSubMenu extends Component {
           mode === 'inline' && this.renderChildren(children)
         }
         {
-          mode !== 'inline' && <Tooltip autoWidth={mode === 'horizontal'} contentClassName={contentClassName} showArrow={false} placement={placement} title={this.renderChildren(children)} hideAfterClick>
+          mode !== 'inline' && <Tooltip autoWidth={mode === 'horizontal'} contentClassName={contentClassName} showArrow={false} placement={placement} title={this.renderChildren(children)}>
             {this.renderTitle(title)}
           </Tooltip>
         }

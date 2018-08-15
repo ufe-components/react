@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import styles from './index.styl'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
@@ -10,6 +11,16 @@ class OptionGroup extends Component {
 
   handleClick = e => {
     e.stopPropagation()
+  }
+
+  componentDidMount () {
+    const dom = ReactDOM.findDOMNode(this)
+    dom.childNodes[0].addEventListener('click', this.handleClick)
+  }
+
+  componentWillUnmount () {
+    const dom = ReactDOM.findDOMNode(this)
+    dom.childNodes[0].removeEventListener('click', this.handleClick)
   }
 
   render () {
@@ -24,7 +35,7 @@ class OptionGroup extends Component {
       [styles['ufe-select-group-list']]: true
     })
     return (
-      <li onClick={this.handleClick} {...rest} className={groupClass}>
+      <li {...rest} className={groupClass}>
         <div className={groupTitleClass}>{label}</div>
         <ul className={groupListClass}>
           {

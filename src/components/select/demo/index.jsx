@@ -62,7 +62,12 @@ class Demo extends Component {
           </Select>
         </div>
         <div style={{margin: 20, display: 'inline-block'}}>
-          <Select mode='multiple' style={{width: 209}} placeholder='please select'>
+          <Select mode='multiple' style={{width: 210}} placeholder='multiple mode'>
+            {children}
+          </Select>
+        </div>
+        <div style={{margin: 20, display: 'inline-block'}}>
+          <Select mode='tags' style={{width: 210}} placeholder='tags mode'>
             {children}
           </Select>
         </div>
