@@ -1,0 +1,62 @@
+.outer
+  overflow hidden
+  position relative
+  .main
+    position relative
+    left 0
+    top 0
+    transition left .8s ease-in-out
+    padding 0
+    margin 0
+    list-style none
+    overflow hidden
+    .item
+      float left
+  .dots
+    padding 0
+    margin 0
+    list-style none
+    position absolute
+    bottom 4px
+    left 50%
+    transform translateX(-50%)
+    .dot
+      display inline-block
+      border-radius 50%
+      width 12px
+      height 12px
+      background-color rgba(0,0,0,.6)
+      margin-right 5px
+      cursor pointer
+      &.dot-active
+        background-color #fff
+  .left
+    position absolute
+    display inline-block
+    left 10px
+    top 50%
+    transform translateY(-50%)
+    background-color rgba(0,0,0,.2)
+    width 30px
+    height 30px
+    text-align center
+    cursor pointer
+    transition opacity .5s linear
+    i
+      font-size 30px
+      color #fff
+  .right
+    position absolute
+    display inline-block
+    right 10px
+    top 50%
+    transform translateY(-50%)
+    background-color rgba(0,0,0,.2)
+    width 30px
+    height 30px
+    text-align center
+    cursor pointer
+    transition opacity .5s linear
+    i
+      font-size 30px
+      color #fff

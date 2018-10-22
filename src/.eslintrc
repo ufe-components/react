@@ -11,6 +11,8 @@
   "extends": ["standard", "standard-react"],
   "rules": {
     "no-self-compare": 0,
-    "react/prop-types": ["children", "className", "style"]
+    "react/prop-types": [2, {
+      "ignore": ["children", "className", "style"]
+    }]
   }
 }
